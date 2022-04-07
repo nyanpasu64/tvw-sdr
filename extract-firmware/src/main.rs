@@ -1,6 +1,5 @@
 use std::env::args_os;
 use std::fs::File;
-use std::io::Read;
 use std::process::exit;
 
 use srec::*;
@@ -36,19 +35,40 @@ fn main() {
 }
 
 fn extract_dsp() {
-    let mut file = File::open("CTRLT507.s3").expect("could not open CTRLT507.s3");
-    let mut buf = Vec::<u8>::new();
-    file.read_to_end(&mut buf)
-        .expect("Error reading CTRLT507.s3");
+    use std::io::{Read, Write};
+    // use std::io::prelude::*;
+
+    let buf = {
+        let mut file = File::open("CTRLT507.s3").expect("could not open CTRLT507.s3");
+        let mut buf = Vec::<u8>::new();
+        file.read_to_end(&mut buf)
+            .expect("Error reading CTRLT507.s3");
+        buf
+    };
+
     let str = std::str::from_utf8(&buf).expect("CTRLT507.s3 is not valid UTF-8");
 
-    let mut records = srec::read_records(str);
-    let record: Record = records
-        .next()
-        .expect("Missing data in CTRLT507.s3")
-        .unwrap();
+    let data: Vec<u8> = {
+        let mut data = Vec::<u8>::new();
 
-    let record = match record {
-        S3(ata<Address32>)
+        // Each line is a record.
+        let records = srec::read_records(str);
+
+        for record in records {
+            let record = record.unwrap();
+            let line_data: Data<Address32> = match record {
+                Record::S3(data) => data,
+                _ => panic!("Unexpected data format {:?}", record),
+            };
+            data.extend_from_slice(line_data.data.as_slice());
+        }
+
+        data
     };
+    drop(buf);
+
+    let mut of = File::create("CTRLT507.bin").expect("could not open CTRLT507.bin");
+    of.write_all(data.as_ref())
+        .expect("Error writing CTRLT507.bin");
+    of.flush().expect("Error flushing CTRLT507.bin");
 }
