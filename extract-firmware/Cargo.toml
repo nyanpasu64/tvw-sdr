@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 srec = "0.2.0"
+jetscii = "0.5.1"

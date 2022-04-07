@@ -9,8 +9,9 @@ static HELP_TEXT: &str = "{dsp, microcode}";
 fn main() {
     let mut args = args_os();
     if args.len() <= 1 {
-        eprintln!("Pass in one or more arguments out of {}", HELP_TEXT);
-        exit(1);
+        extract_dsp();
+        extract_microcode();
+        return;
     }
 
     let mut exit_code = 0;
@@ -24,7 +25,7 @@ fn main() {
         if arg == "dsp" {
             extract_dsp();
         } else if arg == "microcode" {
-            // extract_microcode();
+            extract_microcode();
         } else {
             eprintln!("Unrecognized argument {:?}, supported = {}", arg, HELP_TEXT);
             exit_code = 1;
@@ -36,7 +37,6 @@ fn main() {
 
 fn extract_dsp() {
     use std::io::{Read, Write};
-    // use std::io::prelude::*;
 
     let buf = {
         let mut file = File::open("CTRLT507.s3").expect("could not open CTRLT507.s3");
@@ -78,4 +78,23 @@ fn extract_dsp() {
     of.write_all(data.as_ref())
         .expect("Error writing CTRLT507.bin");
     of.flush().expect("Error flushing CTRLT507.bin");
+}
+
+fn extract_microcode() {
+    use std::io::{Read, Write};
+
+    let buf = {
+        let mut file = File::open("gtatinavrr.sys").expect("could not open gtatinavrr.sys");
+        let mut buf = Vec::<u8>::new();
+        file.read_to_end(&mut buf)
+            .expect("Error reading gtatinavrr.sys");
+        buf
+    };
+
+    // b"T507 AMD"
+    let search: jetscii::Bytes<_> = jetscii::bytes!(0x54, 0x35, 0x30, 0x37, 0x20, 0x41, 0x4D, 0x44);
+
+    let fw_pos = search
+        .find(buf)
+        .expect("Could not find \"T507 AMD\" firmware in gtatinavrr.sys");
 }
