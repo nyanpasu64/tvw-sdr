@@ -30,8 +30,8 @@
 #include <libusb.h>
 
 #include "compat.h"
-#include "tda18271.h"
-#include "tda18271-priv.h"
+// #include "tda18271.h"
+// #include "tda18271-priv.h"
 #include "tvw-reg.h"
 #include "tvw-sdr.h"
 
@@ -5976,13 +5976,13 @@ tvwsdr_init(tvwsdr_dev_t *dev) {
 		return -1;
 	}
 
-	/* tuner config over I2C */
-	printf("Configuring tuner...\n");
-	dev->fe.frontend_priv = dev;
-	if (!tda18271_attach(&dev->fe, 0, NULL, NULL)) {
-		printf("tda18271_attach() failed\n");
-		return -1;
-	}
+	// /* tuner config over I2C */
+	// printf("Configuring tuner...\n");
+	// dev->fe.frontend_priv = dev;
+	// if (!tda18271_attach(&dev->fe, 0, NULL, NULL)) {
+	// 	printf("tda18271_attach() failed\n");
+	// 	return -1;
+	// }
 
 	if (tvwsdr_read_i2c(dev, buf, sizeof(buf))) {
 		printf("failed to read i2c data\n");
@@ -6006,10 +6006,10 @@ tvwsdr_init(tvwsdr_dev_t *dev) {
 		return -1;
 	}
 
-	if (tda18271_tune(&dev->fe, &(((struct tda18271_priv *)dev->fe.tuner_priv)->std.qam_8), 853500000, 8000000)) {
-		printf("failed to tune\n");
-		return -1;
-	}
+	// if (tda18271_tune(&dev->fe, &(((struct tda18271_priv *)dev->fe.tuner_priv)->std.qam_8), 853500000, 8000000)) {
+	// 	printf("failed to tune\n");
+	// 	return -1;
+	// }
 
 	return 0;
 }
@@ -6109,9 +6109,9 @@ tvwsdr_set_center_freq(tvwsdr_dev_t *dev, uint32_t freq) {
 		return -1;
 	}
 
-	if (tda18271_tune(&dev->fe, &(((struct tda18271_priv *)dev->fe.tuner_priv)->std.qam_8), freq, 8000000)) {
-		return -1;
-	}
+	// if (tda18271_tune(&dev->fe, &(((struct tda18271_priv *)dev->fe.tuner_priv)->std.qam_8), freq, 8000000)) {
+	// 	return -1;
+	// }
 
 	return 0;
 }
