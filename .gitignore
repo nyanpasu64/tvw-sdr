@@ -16,24 +16,17 @@ missing
 *.lo
 *.o
 stamp-h1
+compile
 
 # binaries
 src/tvw_sdr
 
 # firmware
-src/CTRL.bin
-src/CTRL.s3
-src/CTRLT506.bin
-src/CTRLT506.s3
-src/CTRLT507-fixed.bin
-src/CTRLT507.bin
-src/CTRLT507.s3
-src/CTRLT511.bin
-src/CTRLT511.s3
-src/T507.bin
-
 target
-CTRLT507.s3
-CTRLT507.bin
-gtatinavrr.sys
-T507.bin
+extract-firmware/CTRLT507.s3
+extract-firmware/CTRLT507.bin
+extract-firmware/gtatinavrr.sys
+extract-firmware/T507.bin
+
+# outputs
+cap.txt
