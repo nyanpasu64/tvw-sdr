@@ -91,10 +91,17 @@ fn extract_microcode() {
         buf
     };
 
-    // b"T507 AMD"
-    let search: jetscii::Bytes<_> = jetscii::bytes!(0x54, 0x35, 0x30, 0x37, 0x20, 0x41, 0x4D, 0x44);
-
-    let fw_pos = search
-        .find(buf)
+    let fw_pos: usize = memchr::memmem::find(&buf, b"T507 AMD")
         .expect("Could not find \"T507 AMD\" firmware in gtatinavrr.sys");
+
+    // See decompilation, do_MicroCodeDownload.
+    let fw_file = &buf[fw_pos..];
+
+    let fw_size = u32::from_be_bytes(fw_file[0x10..0x14].try_into().unwrap());
+    assert!(fw_size == 0x95c9);
+    let fw = &fw_file[0x1c..][..fw_size as usize];
+
+    let mut of = File::create("T507.bin").expect("could not open T507.bin");
+    of.write_all(fw).expect("Error writing T507.bin");
+    of.flush().expect("Error flushing T507.bin");
 }

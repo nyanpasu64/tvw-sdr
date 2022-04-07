@@ -33,6 +33,7 @@ src/CTRLT511.s3
 src/T507.bin
 
 target
-gtatinavrr.sys
 CTRLT507.s3
 CTRLT507.bin
+gtatinavrr.sys
+T507.bin
