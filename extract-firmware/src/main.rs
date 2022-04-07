@@ -1,4 +1,4 @@
-use std::env::args;
+use std::env::args_os;
 use std::fs::File;
 use std::io;
 use std::process::exit;
@@ -6,7 +6,7 @@ use std::process::exit;
 static HELP_TEXT: &str = "{dsp, microcode}";
 
 fn main() {
-    let mut args = args();
+    let mut args = args_os();
     if args.len() <= 1 {
         eprintln!("Pass in one or more arguments out of {}", HELP_TEXT);
         exit(1);
@@ -19,17 +19,18 @@ fn main() {
 
     // Process the remaining arguments.
     for arg in args {
-        match arg.as_str() {
-            "dsp" => extract_dsp(),
-            // "microcode" => extract_microcode(),
-            _ => {
-                eprintln!(
-                    "Unrecognized argument \"{}\", supported = {}",
-                    arg, HELP_TEXT
-                );
-                exit_code = 1;
-                continue;
-            }
+        let arg = arg.as_os_str();
+        if arg == "dsp" {
+            extract_dsp();
+        } else if arg == "microcode" {
+            // extract_microcode();
+        } else {
+            eprintln!(
+                "Unrecognized argument {:?}, supported = {}",
+                arg, HELP_TEXT
+            );
+            exit_code = 1;
+            continue;
         }
     }
     exit(exit_code);
