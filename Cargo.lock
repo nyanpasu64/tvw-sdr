@@ -5,3 +5,12 @@ version = 3
 [[package]]
 name = "extract-firmware"
 version = "0.1.0"
+dependencies = [
+ "srec",
+]
+
+[[package]]
+name = "srec"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17c3a0538ec242e3cd333cdcdc8b720faa2fa0a9d7f444cf1ff63e7d3303adfb"

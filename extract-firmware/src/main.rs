@@ -1,7 +1,9 @@
 use std::env::args_os;
 use std::fs::File;
-use std::io;
+use std::io::Read;
 use std::process::exit;
+
+use srec::*;
 
 static HELP_TEXT: &str = "{dsp, microcode}";
 
@@ -25,10 +27,7 @@ fn main() {
         } else if arg == "microcode" {
             // extract_microcode();
         } else {
-            eprintln!(
-                "Unrecognized argument {:?}, supported = {}",
-                arg, HELP_TEXT
-            );
+            eprintln!("Unrecognized argument {:?}, supported = {}", arg, HELP_TEXT);
             exit_code = 1;
             continue;
         }
@@ -37,25 +36,19 @@ fn main() {
 }
 
 fn extract_dsp() {
-    // implicit
-    use std::io::BufRead;
+    let mut file = File::open("CTRLT507.s3").expect("could not open CTRLT507.s3");
+    let mut buf = Vec::<u8>::new();
+    file.read_to_end(&mut buf)
+        .expect("Error reading CTRLT507.s3");
+    let str = std::str::from_utf8(&buf).expect("CTRLT507.s3 is not valid UTF-8");
 
-    let file = File::open("CTRLT507.s3").expect("could not open CTRLT507.s3");
-    let lines = io::BufReader::new(file).lines();
+    let mut records = srec::read_records(str);
+    let record: Record = records
+        .next()
+        .expect("Missing data in CTRLT507.s3")
+        .unwrap();
 
-    for line in lines {
-        let line: String = line.expect("Error reading CTRLT507.s3");
-        if line.is_empty() {
-            continue;
-        }
-        let mut line = line.as_bytes();
-
-        if !line.starts_with(b"S3") {
-            panic!("Line \"{:?}\" does not start with \"S3\"!", line);
-        }
-        line = &line[b"S3".len()..];
-
-
-        // line
-    }
+    let record = match record {
+        S3(ata<Address32>)
+    };
 }
