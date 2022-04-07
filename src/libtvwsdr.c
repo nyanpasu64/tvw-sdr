@@ -5337,6 +5337,8 @@ tvwsdr_read_reg(tvwsdr_dev_t *dev, uint16_t reg, uint16_t page, void *buf, uint1
 	unsigned char tmpbuf[12] = {0};
 
 	/* ugly hack for one register read following the firmware upload */
+	// An equivalent hack lives in QUSB::TryTransferRegisterUlong
+	// (but instead translates address 0xa0000000 to 0x80000000 with flags).
 	if (reg == 0x0000 && page == 0x8000 && len == 0x0000) {
 		flags = 0xbfc1;
 		rlen = 4;
