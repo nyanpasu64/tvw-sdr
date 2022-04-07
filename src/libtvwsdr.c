@@ -5943,7 +5943,7 @@ tvwsdr_init(tvwsdr_dev_t *dev) {
 		return -1;
 	}
 
-	// 0x1301000001001a8e0000000000000000 
+	// 0x1301000001001a8e0000000000000000
 	memset(buf, 0, sizeof(buf));
 	buf[0] = 0x13;
 	buf[1] = 0x01;
@@ -5979,7 +5979,11 @@ tvwsdr_init(tvwsdr_dev_t *dev) {
 	/* tuner config over I2C */
 	printf("Configuring tuner...\n");
 	dev->fe.frontend_priv = dev;
-	tda18271_attach(&dev->fe, 0, NULL, NULL);
+	if (!tda18271_attach(&dev->fe, 0, NULL, NULL)) {
+		printf("tda18271_attach() failed\n");
+		return -1;
+	}
+
 	if (tvwsdr_read_i2c(dev, buf, sizeof(buf))) {
 		printf("failed to read i2c data\n");
 		return -1;
@@ -6027,6 +6031,7 @@ tvwsdr_init7(tvwsdr_dev_t *dev) {
 int
 tvwsdr_open(tvwsdr_dev_t **out_dev) {
 	tvwsdr_dev_t *dev = NULL;
+	*out_dev = dev;
 
 	dev = malloc(sizeof(tvwsdr_dev_t));
 	if (NULL == dev) {
@@ -6049,9 +6054,13 @@ tvwsdr_open(tvwsdr_dev_t **out_dev) {
 	}
 
 	// XXX
-	tvwsdr_init(dev);
+	if (tvwsdr_init(dev)) {
+		goto err;
+	}
 	//tvwsdr_start_async();
-	tvwsdr_init7(dev);
+	if (tvwsdr_init7(dev)) {
+		goto err;
+	}
 
 	*out_dev = dev;
 
