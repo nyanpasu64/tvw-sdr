@@ -49,21 +49,28 @@ fn extract_dsp() {
     let str = std::str::from_utf8(&buf).expect("CTRLT507.s3 is not valid UTF-8");
 
     let data: Vec<u8> = {
-        let mut data = Vec::<u8>::new();
+        let mut binary = Vec::<u8>::new();
 
         // Each line is a record.
         let records = srec::read_records(str);
 
         for record in records {
             let record = record.unwrap();
-            let line_data: Data<Address32> = match record {
+            let line: Data<Address32> = match record {
                 Record::S3(data) => data,
-                _ => panic!("Unexpected data format {:?}", record),
+                _ => {
+                    // The official driver ignores all non-S3 lines of text.
+                    continue;
+                }
             };
-            data.extend_from_slice(line_data.data.as_slice());
+            let begin_addr = line.address.0 as usize - 0xBFC00000;
+            let end_addr = begin_addr + line.data.len();
+
+            binary.resize(binary.len().max(end_addr), 0);
+            (&mut binary[begin_addr..end_addr]).copy_from_slice(&line.data);
         }
 
-        data
+        binary
     };
     drop(buf);
 
